@@ -137,8 +137,8 @@ public class CucumberResult {
 		buffer.append("| ------------ | :---------------: | :----------: | :---:  |\n");
 
 		// Iterate over features and build results matrix
-        Integer overallPassed = 0;
-        Integer overallFailed = 0;
+        int overallPassed = 0;
+        int overallFailed = 0;
 
 		for (FeatureResult feature : getFeatureResults()) {
 			buffer.append(String.format("| [%s](%s)", feature.getDisplayName(), hyperLink + feature.getFeatureUri()));
