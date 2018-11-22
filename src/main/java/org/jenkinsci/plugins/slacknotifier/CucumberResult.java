@@ -132,13 +132,14 @@ public class CucumberResult {
 		buffer.append(String.format("Total features: %d\n", this.getFeatureResults().size()));
 		buffer.append(String.format("Total scenarios: %d\n\n", this.totalScenarios));
 
-		buffer.append(String.format("Passed features: %d%%\n\n", getPassPercentage()));
-
 		// Add the top table headers
 		buffer.append("| Features     | Passed            | Failed       | Status |\n");
 		buffer.append("| ------------ | :---------------: | :----------: | :---:  |\n");
 
 		// Iterate over features and build results matrix
+        Integer overallPassed = 0;
+        Integer overallFailed = 0;
+
 		for (FeatureResult feature : getFeatureResults()) {
 			buffer.append(String.format("| [%s](%s)", feature.getDisplayName(), hyperLink + feature.getFeatureUri()));
 			buffer.append(String.format("| %d%% (%d/%d) ", feature.getPassPercentage(), feature.getTotalPassedScenarios(), feature.getTotalScenarios()));
@@ -148,7 +149,18 @@ public class CucumberResult {
 			} else {
 				buffer.append("| :x: |\n");
 			}
+
+			// Update the overall counters
+            overallFailed += feature.getTotalFailedScenarios();
+			overallPassed += feature.getTotalPassedScenarios();
 		}
+
+		// End the table with the overall result
+        buffer.append(String.format(
+                "| *Total*   | *%d%% (%d/%d)*   | *%d%% (%d/%d)*   |  -  |\n",
+                getPassPercentage(), overallPassed, this.totalScenarios,
+                100 - getPassPercentage(), overallFailed, this.totalScenarios
+        ));
 
 		return buffer.toString();
 	}
