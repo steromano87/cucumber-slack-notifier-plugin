@@ -34,10 +34,19 @@ public class SlackClient {
 		this.hideSuccessfulResults = hideSuccessfulResults;
 	}
 
-	public void postToSlack(JsonElement results, final String jobName, final int buildNumber, final String extra) {
-		LOG.info("Publishing test report to slack channel: " + channel);
+	public void postToSlack(JsonElement results, final String jobName, final int buildNumber, final String buildUrl) {
+		LOG.info("Publishing test report to channel: " + channel);
 		CucumberResult result = results == null ? dummyResults() : processResults(results);
-		String json = result.toSlackMessage(jobName, buildNumber, channel, jenkinsUrl, extra);
+		String json;
+
+		// If the WebHook URL is similar to Slack, use Slack notifier
+		if (this.webhookUrl.contains("hooks.slack.com")) {
+			LOG.info("Using Slack message format");
+			json = result.toSlackMessage(jobName, buildNumber, channel, jenkinsUrl, buildUrl);
+		} else {
+			LOG.info("Using Mattermost message format");
+			json = result.toMattermostMessage(jobName, buildNumber, channel, jenkinsUrl, buildUrl);
+		}
 		postToSlack(json);
 	}
 

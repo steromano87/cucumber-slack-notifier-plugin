@@ -2,8 +2,6 @@ package org.jenkinsci.plugins.slacknotifier;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -35,10 +33,10 @@ public class CucumberResult {
 	}
 	
 	public String toSlackMessage(final String jobName,
-			final int buildNumber, final String channel, final String jenkinsUrl, final String extra) {
+			final int buildNumber, final String channel, final String jenkinsUrl, final String buildUrl) {
 		final JsonObject json = new JsonObject();
 		json.addProperty("channel", "#" + channel);
-		addCaption(json, buildNumber, jobName, jenkinsUrl, extra);
+		addCaption(json, buildNumber, jobName, jenkinsUrl, buildUrl);
 		json.add("fields", getFields(jobName, buildNumber, jenkinsUrl));
 
 		if (getPassPercentage() == 100) {
@@ -49,6 +47,15 @@ public class CucumberResult {
 			addColourAndIcon(json, "danger", ":thumbsdown:");
 		}
 
+		json.addProperty("username", jobName);
+		return json.toString();
+	}
+
+	public String toMattermostMessage(final String jobName,
+			final int buildNumber, final String channel, final String jenkinsUrl, final String buildUrl) {
+		final JsonObject json = new JsonObject();
+		json.addProperty("channel", "#" + channel);
+		json.addProperty("text", this.buildResultsTable(jobName, buildNumber, buildUrl));
 		json.addProperty("username", jobName);
 		return json.toString();
 	}
@@ -67,25 +74,21 @@ public class CucumberResult {
 		return s.toString();
 	}
 	
-	public String toHeader(final String jobName, final int buildNumber, final String jenkinsUrl, final String extra) {
+	public String toHeader(final String jobName, final int buildNumber, final String jenkinsUrl, final String buildUrl) {
 		StringBuilder s = new StringBuilder();
-		if (StringUtils.isNotEmpty(extra)) {
-			s.append(extra);
-		}
 		s.append("Features: ");
 		s.append(getTotalFeatures());
 		s.append(", Scenarios: ");
 		s.append(getTotalScenarios());
 		s.append(", Build: <");
-		s.append(getJenkinsHyperlink(jenkinsUrl, jobName, buildNumber));
-		s.append("cucumber-html-reports/|");
-		s.append(buildNumber);
+		s.append(buildUrl);
+		s.append(String.format("cucumber-html-reports/|%d", buildNumber));
 		s.append(">");
 		return s.toString();
 	}
 	
-	private void addCaption(final JsonObject json, final int buildNumber, final String jobName, final String jenkinsUrl, final String extra) {
-		json.addProperty("pretext", toHeader(jobName, buildNumber, jenkinsUrl, extra));
+	private void addCaption(final JsonObject json, final int buildNumber, final String jobName, final String jenkinsUrl, final String buildUrl) {
+		json.addProperty("pretext", toHeader(jobName, buildNumber, jenkinsUrl, buildUrl));
 	}
 	
 	private void addColourAndIcon(JsonObject json, String good, String value) {
@@ -109,6 +112,45 @@ public class CucumberResult {
 		fields.add(shortObject("Total Passed"));
 		fields.add(shortObject(getPassPercentage() + " %"));
 		return fields;
+	}
+
+
+	private String buildResultsTable(final String jobName, final int buildNumber, final String buildUrl) {
+		final String hyperLink = buildUrl + "cucumber-html-reports/report-feature_";
+		StringBuilder buffer = new StringBuilder();
+
+		// Start by writing jobname and build number in message header
+		buffer.append(String.format("#### Test results for job \"%s\", build [#%d](%s) ", jobName, buildNumber, buildUrl));
+		if (getPassPercentage() == 100) {
+			buffer.append(":white_check_mark:");
+		} else {
+			buffer.append(":x:");
+		}
+		buffer.append("\n");
+
+		// Add the detail for the total scenarios
+		buffer.append(String.format("Total features: %d\n", this.getFeatureResults().size()));
+		buffer.append(String.format("Total scenarios: %d\n\n", this.totalScenarios));
+
+		buffer.append(String.format("Passed features: %d%%\n\n", getPassPercentage()));
+
+		// Add the top table headers
+		buffer.append("| Features     | Passed            | Failed       | Status |\n");
+		buffer.append("| ------------ | :---------------: | :----------: | :---:  |\n");
+
+		// Iterate over features and build results matrix
+		for (FeatureResult feature : getFeatureResults()) {
+			buffer.append(String.format("| [%s](%s)", feature.getDisplayName(), hyperLink + feature.getFeatureUri()));
+			buffer.append(String.format("| %d%% (%d/%d) ", feature.getPassPercentage(), feature.getTotalPassedScenarios(), feature.getTotalScenarios()));
+			buffer.append(String.format("| %d%% (%d/%d) ", 100 - feature.getPassPercentage(), feature.getTotalFailedScenarios(), feature.getTotalScenarios()));
+			if (feature.getPassPercentage() == 100) {
+				buffer.append("| :white_check_mark: |\n");
+			} else {
+				buffer.append("| :x: |\n");
+			}
+		}
+
+		return buffer.toString();
 	}
 
 	

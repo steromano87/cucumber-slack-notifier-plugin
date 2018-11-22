@@ -62,7 +62,11 @@ public class CucumberSlack extends JobProperty<Job<?, ?>> {
 			}
 
 			if (!value.startsWith("https://hooks.slack.com/")) {
-				return FormValidation.warning("Slack endpoint should start with https://hooks.slack.com/");
+				if (value.contains("/hooks/")) {
+					return FormValidation.ok("Endpoint assumed to be a Mattermost endpoint, proper message format will be used");
+				} else {
+					return FormValidation.warning("Slack endpoint should start with https://hooks.slack.com/");
+				}
 			}
 
 			return FormValidation.ok();
