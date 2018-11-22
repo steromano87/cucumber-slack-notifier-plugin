@@ -5,16 +5,18 @@ public class FeatureResult {
 	final int passPercentage;
 	final int totalFailedScenarios;
 	final int totalScenarios;
+	final String uri;
 
 	public FeatureResult(String name, int passPercentage) {
-		this(name, passPercentage, 0, 0);
+		this(name, passPercentage, 0, 0, name);
 	}
 
-	public FeatureResult(String name, int passPercentage, int totalScenarios, int totalFailedScenarios) {
+	public FeatureResult(String name, int passPercentage, int totalScenarios, int totalFailedScenarios, String uri) {
 		this.name = name;
 		this.passPercentage = passPercentage;
 		this.totalScenarios = totalScenarios;
 		this.totalFailedScenarios = totalFailedScenarios;
+		this.uri = uri;
 	}
 
 	public String toString() {
@@ -24,13 +26,17 @@ public class FeatureResult {
 	public String getName() {
 		return this.name;
 	}
+
+	public String getUri() {
+		return this.uri;
+	}
 	
 	public String getFeatureUri() {
-		return this.name.replace(".feature", "-feature") + ".html";
+		return this.uri.replace(".feature", "-feature") + ".html";
 	}
 	
 	public String getDisplayName() {
-		return this.name.replaceAll("_", " ").replace(".feature", "");
+		return this.name.replaceAll("_", " ").replace(" feature$", "");
 	}
 	
 	public int getPassPercentage() {
