@@ -146,6 +146,8 @@ public class CucumberResult {
 			buffer.append(String.format("| %d%% (%d/%d) ", 100 - feature.getPassPercentage(), feature.getTotalFailedScenarios(), feature.getTotalScenarios()));
 			if (feature.getPassPercentage() == 100) {
 				buffer.append("| :white_check_mark: |\n");
+			} else if (feature.getPassPercentage() != 100 && feature.getTotalFailedScenarios() != feature.totalScenarios) {
+				buffer.append("| :warning: |\n");
 			} else {
 				buffer.append("| :x: |\n");
 			}
