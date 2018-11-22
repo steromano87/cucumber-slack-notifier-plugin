@@ -39,7 +39,7 @@ public class CucumberSlackService {
 		
 		final Gson gson = new Gson();
 		try {
-			final JsonReader jsonReader = new JsonReader(new InputStreamReader(jsonPath.read()));
+			final JsonReader jsonReader = new JsonReader(new InputStreamReader(jsonPath.read(), "UTF-8"));
 			return gson.fromJson(jsonReader, JsonElement.class);
 		} catch (IOException e) {
 			LOG.severe("Exception occurred while reading test results: " + e);
