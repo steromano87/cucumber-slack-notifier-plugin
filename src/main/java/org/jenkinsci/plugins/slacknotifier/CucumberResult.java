@@ -55,7 +55,7 @@ public class CucumberResult {
 			final int buildNumber, final String channel, final String jenkinsUrl, final String buildUrl) {
 		final JsonObject json = new JsonObject();
 		json.addProperty("channel", "#" + channel);
-		json.addProperty("text", this.buildResultsTable(jobName, buildNumber, buildUrl));
+		json.addProperty("text", this.buildResultsTable(jobName, jenkinsUrl, buildNumber, buildUrl));
 		json.addProperty("username", jobName);
 		return json.toString();
 	}
@@ -115,12 +115,12 @@ public class CucumberResult {
 	}
 
 
-	private String buildResultsTable(final String jobName, final int buildNumber, final String buildUrl) {
-		final String hyperLink = buildUrl + "cucumber-html-reports/report-feature_";
+	private String buildResultsTable(final String jobName, final String jenkinsUrl, final int buildNumber, final String buildUrl) {
+		final String hyperLink = jenkinsUrl + buildUrl + "cucumber-html-reports/report-feature_";
 		StringBuilder buffer = new StringBuilder();
 
 		// Start by writing jobname and build number in message header
-		buffer.append(String.format("#### Test results for job \"%s\", build [#%d](%s) ", jobName, buildNumber, buildUrl));
+		buffer.append(String.format("#### Test results for job \"%s\", build [#%d](%s) ", jobName, buildNumber, jenkinsUrl + buildUrl));
 		if (getPassPercentage() == 100) {
 			buffer.append(":white_check_mark:");
 		} else {
