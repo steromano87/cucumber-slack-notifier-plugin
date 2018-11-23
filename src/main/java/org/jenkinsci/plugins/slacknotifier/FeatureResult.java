@@ -32,7 +32,7 @@ public class FeatureResult {
 	}
 	
 	public String getFeatureUri() {
-		return this.uri.replace(".feature", "-feature") + ".html";
+		return this.uri.replace(".feature", "-feature").replace(" ", "-") + ".html";
 	}
 	
 	public String getDisplayName() {
