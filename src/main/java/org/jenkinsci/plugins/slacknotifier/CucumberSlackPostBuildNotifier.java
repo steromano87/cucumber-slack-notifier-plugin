@@ -96,7 +96,7 @@ public class CucumberSlackPostBuildNotifier extends Recorder {
 		}
 
 		public String getDisplayName() {
-			return "Send Cucumber Report to Slack";
+			return "Send Cucumber Report to Slack/Mattermost";
 		}
 
 		@Override

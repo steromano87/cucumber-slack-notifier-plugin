@@ -38,7 +38,7 @@ public class CucumberSlack extends JobProperty<Job<?, ?>> {
 
 		@Override
 		public String getDisplayName() {
-			return "Cucumber Slack Notifier";
+			return "Cucumber Slack/Mattermost Notifier";
 		}
 
 		@Override

@@ -90,7 +90,7 @@ public class CucumberSlackBuildStepNotifier extends Builder {
 		}
 
 		public String getDisplayName() {
-			return "Send Cucumber Report to Slack";
+			return "Send Cucumber Report to Slack/Mattermost";
 		}
 
 		@Override
