@@ -141,7 +141,7 @@ public class CucumberResult {
         int overallFailed = 0;
 
 		for (FeatureResult feature : getFeatureResults()) {
-			buffer.append(String.format("| [%s](%s)", feature.getDisplayName(), hyperLink + feature.getFeatureUri()));
+			buffer.append(String.format("| [%s](%s)", feature.getDisplayName(), hyperLink + feature.getFeatureUri().replace('/', '-')));
 			buffer.append(String.format("| %d%% (%d/%d) ", feature.getPassPercentage(), feature.getTotalPassedScenarios(), feature.getTotalScenarios()));
 			buffer.append(String.format("| %d%% (%d/%d) ", 100 - feature.getPassPercentage(), feature.getTotalFailedScenarios(), feature.getTotalScenarios()));
 			if (feature.getPassPercentage() == 100) {
